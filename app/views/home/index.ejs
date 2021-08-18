@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Pinspect - Commerce</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+	<style>
+		.json-key {
+			color: brown;
+		}
+
+		.json-value {
+			color: navy;
+		}
+
+		.json-string {
+			color: olive;
+		}
+	</style>
+</head>
+
+<body>
+
+	<nav class="navbar navbar-dark bg-dark fixed-top">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Pinspect - Commerce</a>
+		</div>
+	</nav>
+	<main>
+		<aside class="main-sidebar">
+			<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="height: 100vh;">
+				<!--
+				<a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+					<svg class="bi me-2" width="40" height="32">
+						<use xlink:href="#bootstrap"></use>
+					</svg>
+					<span class="fs-4">Pinspect - Commerce</span>
+				</a>
+				-->
+				<hr>
+				<ul class="nav nav-pills flex-column mb-auto" style="margin-top: 20px;">
+					<li class="nav-item">
+						<a href="#" class="nav-link active" aria-current="page">
+							<svg class="bi me-2" width="16" height="16">
+								<use xlink:href="#home"></use>
+							</svg>
+							Pedidos
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-link text-white">
+							<svg class="bi me-2" width="16" height="16">
+								<use xlink:href="#speedometer2"></use>
+							</svg>
+							Produtos
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-link text-white">
+							<svg class="bi me-2" width="16" height="16">
+								<use xlink:href="#table"></use>
+							</svg>
+							Clientes
+						</a>
+					</li>
+
+				</ul>
+			</div>
+		</aside>
+		<div class="content-wrapper">
+			<div id="content" class="container">
+				<h4>
+					General
+					<div class="pull-right">
+						<a href="javascript:void(0)" class="change-format">
+							<i class="fa fa-fw fa-code"></i>
+							<i class="fa fa-fw fa-magic" data-toggle="tooltip" data-placement="bottom"
+								data-original-title="See in Pretty Format"></i>
+						</a>
+					</div>
+				</h4>
+				<div class="result"></div>
+			</div>
+		</div>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+		integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
+		integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+	<link rel="stylesheet" type="text/css" href="http://pgrabovets.github.io/json-view/jsonview.bundle.css">
+	<script src="http://pgrabovets.github.io/json-view/jsonview.bundle.js"></script>
+
+	<script src="https://use.fontawesome.com/3645486392.js"></script>
+
+	<script>
+		const isJson = function (str) {
+			try {
+				JSON.parse(str);
+			} catch (e) {
+				return false;
+			}
+			return true;
+		};
+
+		$(function () {
+			$.ajax({
+				url: '//localhost:8000/getproduct',
+				type: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				data: JSON.stringify({
+					"store": "helpdesk",
+					"method": "GetProduct",
+					"id": 1
+				})
+			}).done(response => {
+				let properties = [];
+				for (var [key, value] of Object.entries(response)) {
+					//console.log(key + ' ' + value);
+					//console.log(key, typeof (value));
+					if (typeof (value) == 'object') {
+						if (value == null) {
+							value += '';
+						} else if (value.length == 0) {
+							value = '[]';
+						} else if (isJson(JSON.stringify(value))) {
+							value = `<pre>${JSON.stringify(value)}</pre>`;
+						}
+					}
+					properties.push({
+						key,
+						value
+					})
+				}
+				var source = $("#template-data-table").html();
+				var template = Handlebars.compile(source);
+				var html = template({
+					properties,
+					response: JSON.stringify(response)
+				});
+
+				$('#content .result').html(html);
+
+				$('pre').each(function (k, i) {
+					var parent = $(this).closest('.pre'),
+						idx = parent.data('idx');
+					JsonView.renderJSON(JSON.parse($(this).html()), $(`div[data-idx="${idx}"]`)[0]);
+				});
+
+				JsonView.renderJSON(JSON.parse($('.json .pre').html()), $(`.json div`)[0]);
+			});
+
+			$('.change-format').on('click', () => {
+				$('body').toggleClass('show-json')
+			});
+		});
+	</script>
+
+	<template id="template-data-table">
+		<div class="pretty">
+			{{#each properties}}
+			<div class="row">
+				<div class="col-12 col-lg-3">
+					<strong>{{ key }}</strong>
+				</div>
+				<div class="col-12 col-lg-9">
+					<span class="pre" data-idx="{{@index}}">{{{ value }}}</span>
+					<div data-idx="{{@index}}"></div>
+				</div>
+			</div>
+			{{/each}}
+		</div>
+		<div class="json">
+			<span class="pre">{{ response }}</span>
+			<div></div>
+		</div>
+	</template>
+</body>
+
+</html>

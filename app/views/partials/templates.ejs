@@ -1,0 +1,19 @@
+<template id="template-data-table">
+    <div class="pretty">
+        {{#each properties}}
+        <div class="row">
+            <div class="col-12 col-lg-3">
+                <strong>{{ key }}</strong>
+            </div>
+            <div class="col-12 col-lg-9">
+                <span class="pre" data-idx="{{@index}}">{{{ value }}}</span>
+                <div data-idx="{{@index}}"></div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    <div class="json">
+        <span class="pre">{{ response }}</span>
+        <div></div>
+    </div>
+</template>

@@ -1,0 +1,35 @@
+<aside class="main-sidebar">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="height: 100vh;">
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto" style="margin-top: 20px;">
+            <li class="nav-item">
+                <a href="/order/<%=tenant%>" class="nav-link <% if (entity == 'order') { %>active<% } else { %>text-white<% } %>">                           
+                    Pedidos
+                </a>
+            </li>
+            <li>
+                <a href="/product/<%=tenant%>"
+                    class="nav-link <% if (entity == 'product') { %>active<% } else { %>text-white<% } %> ">
+                    Produtos
+                </a>
+            </li>
+            <li>
+                <a href="/customer/<%=tenant%>"
+                    class="nav-link <% if (entity == 'customer') { %>active<% } else { %>text-white<% } %>">
+                    Clientes
+                </a>
+            </li>
+            <li>
+                <a href="/sku/<%=tenant%>" class="nav-link <% if (entity == 'sku') { %>active<% } else { %>text-white<% } %>">
+                    SKUs
+                </a>
+            </li>
+            <li>
+                <a href="/website/<%=tenant%>" class="nav-link <% if (entity == 'website') { %>active<% } else { %>text-white<% } %>">
+                    Canais
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</aside>
